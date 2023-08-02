@@ -13,11 +13,32 @@ provider "aws" {
     region = "us-east-1"
 }
 
+data "aws_ami" "amzLinux" {
+    most_recent = true
+    owners = ["amazon"]
+    filter {
+        name = "name"
+        values = ["amzn2-ami-hvm-*-gp2"]
+    }
+    filter {
+        name = "root-device-type"
+        values =["ebs"]
+    }
+    filter {
+        name = "virtualization-type"
+        values =["hvm"]
+    }
+    filter {
+        name = "architecture"
+        values = ["x86_64"]
+    }
+}
+
 resource "aws_instance" "app_server" {
-    ami = "ami-0efce49721f2fecff"
-    instance_type = "t2.micro"
+    ami = data.aws_ami.amzLinux.id
+    instance_type = var.ec2_instance_type
 
     tags = {
-        Name = "FirstAppServerInstance"
+        Name = var.instance_name
     }
 }
